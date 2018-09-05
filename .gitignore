@@ -1,0 +1,8 @@
+*.gz
+*.bz2
+binutils/binutils-2.31.1-*
+cpp/cpp-*
+cpp/y.tab.c
+gcc7/gcc-7.3.0-*
+cpp/*.ostrap
+proto

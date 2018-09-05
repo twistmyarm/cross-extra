@@ -1,0 +1,168 @@
+#
+# This file and its contents are supplied under the terms of the
+# Common Development and Distribution License ("CDDL"), version 1.0.
+# You may only use this file in accordance with the terms of version
+# 1.0 of the CDDL.
+#
+# A full copy of the text of the CDDL should have accompanied this
+# source.  A copy of the CDDL is also available via the Internet at
+# http://www.illumos.org/license/CDDL.
+#
+
+#
+# Copyright (c) 2018, Joyent, Inc.
+#
+
+BASE =		$(PWD)
+DESTDIR =	$(BASE)/../proto/$(ARCH)
+NATIVE_DESTDIR =	$(BASE)/../proto/$(NATIVE_ARCH)
+VER.32 =	$(VER)-$(ARCH)-32$(STRAP)
+VER.64 =	$(VER)-$(ARCH)-64$(STRAP)
+OBJ.32 =	$(VER.32)$(SEPARATE_BUILD:yes=.build)
+OBJ.64 =	$(VER.64)$(SEPARATE_BUILD:yes=.build)
+CTF.32 =	ctfobjects-$(ARCH)-32$(STRAP)
+CTF.64 =	ctfobjects-$(ARCH)-64$(STRAP)
+
+FETCH_BASE =	https://us-east.manta.joyent.com/rmustacc/public/cross-extra
+
+ifeq ($(STRAP),strap)
+STRAPPROTO =	$(DESTDIR)
+GCC =		$(DESTDIR)/usr/gcc/4/bin/gcc
+GXX =		$(DESTDIR)/usr/gcc/4/bin/g++
+else
+STRAPPROTO =	$(DESTDIR:proto=proto.strap)
+GCC =		$(DESTDIR)/usr/bin/gcc
+GXX =		$(DESTDIR)/usr/bin/g++
+endif
+
+PATH =		$(STRAPPROTO)/usr/bin:/usr/bin:/usr/sbin:/sbin:/opt/local/bin
+
+MAKE =		gmake
+MAX_JOBS =	128
+PARALLEL =	-j$(MAX_JOBS)
+MAKE_VERBOSE =	V=1
+GCC.64 =	$(GCC) -m64
+GXX.64 =	$(GXX) -m64
+
+GCC.host =	/opt/local/bin/gcc
+GXX.host =	/opt/local/bin/g++
+GCC.host.64 =	$(GCC.host) -m64
+GXX.host.64 =	$(GXX.host) -m64
+
+LEX = 		/opt/local/bin/lex
+YACC = 		/opt/local/bin/yacc
+GPATCH =	/opt/local/bin/gpatch
+
+SYSINCDIRS =	/usr/include
+SYSLIBDIRS =	/usr/lib /lib
+
+BUILD32 =	yes
+BUILD64 =
+SEPARATE_BUILD =
+
+CPPFLAGS =	$(SYSINCDIRS:%=-isystem $(DESTDIR)/%)
+
+#
+# We ship platform-private perl modules (e.g. from ntp) in this directory,
+# and using this perl interpeter:
+#
+PATH_PERL =	/usr/perl5/bin/perl
+PERLLIBDIR =	/usr/perl5/5.12/lib
+
+#
+# These are all definitions that relate to Sun Make. There are basically two
+# different sets that we care about. The first is the boostrap make. This is
+# used to build the strap make. Once we have the strap make, it is used for all
+# other makes. Beacuse MAKE is used extensively to mean GNU make in these
+# makefiles, we instead use SUN_MAKE and SUM_MAKE_STRAP.
+#
+SUN_MAKE_STRAP=/opt/local/bin/dmake
+SUN_MAKE=$(STRAPPROTO)/usr/bin/dmake
+
+#
+# Because of bugs in ntp, we need to be able to refer to the target specific
+# flags as well as the generic flags later on.
+#
+ifneq ($(STRAP),strap)
+	GENLDFLAGS = -Wl,-zassert-deflib -Wl,-zfatal-warnings
+endif
+T32_LDFLAGS =	$(SYSLIBDIRS:%=-L$(DESTDIR)/%)
+T64_LDFLAGS =	$(SYSLIBDIRS:%=-L$(DESTDIR)/%/64)
+LDFLAGS =	$(T32_LDFLAGS) $(GENLDFLAGS)
+LDFLAGS.64 =	$(T64_LDFLAGS) $(GENLDFLAGS)
+
+AUTOCONF_CC =		CC="$(GCC)"
+AUTOCONF_CXX =		CXX="$(GXX)"
+AUTOCONF_CC.64 =	CC="$(GCC.64)"
+AUTOCONF_CXX.64 =	CXX="$(GXX.64)"
+AUTOCONF_CPPFLAGS =	CPPFLAGS="$(CPPFLAGS)"
+AUTOCONF_CFLAGS =	CFLAGS="$(CFLAGS)"
+AUTOCONF_CFLAGS.64 =	CFLAGS="$(CFLAGS.64)"
+AUTOCONF_LDFLAGS =	LDFLAGS="$(LDFLAGS)"
+AUTOCONF_LDFLAGS.64 =	LDFLAGS="$(LDFLAGS.64)"
+AUTOCONF_LIBS =		LIBS="$(LIBS)"
+AUTOCONF_LIBS.64 =	LIBS="$(LIBS.64)"
+
+AUTOCONF_OUT =		config.status
+AUTOCONF_OUT.32 =	$(OBJ.32)/$(AUTOCONF_OUT)
+AUTOCONF_OUT.64 =	$(OBJ.64)/$(AUTOCONF_OUT)
+
+AUTOCONF_PREFIX =	/usr
+
+AUTOCONF_ENV = \
+	PKG_CONFIG_LIBDIR="" \
+	$(AUTOCONF_CC) \
+	$(AUTOCONF_CXX) \
+	$(AUTOCONF_CPPFLAGS) \
+	$(AUTOCONF_CFLAGS) \
+	$(AUTOCONF_LDFLAGS) \
+	$(AUTOCONF_LIBS)
+
+AUTOCONF_ENV.64 = \
+	PKG_CONFIG_LIBDIR="" \
+	$(AUTOCONF_CC.64) \
+	$(AUTOCONF_CXX.64) \
+	$(AUTOCONF_CPPFLAGS) \
+	$(AUTOCONF_CFLAGS.64) \
+	$(AUTOCONF_LDFLAGS.64) \
+	$(AUTOCONF_LIBS.64)
+
+AUTOCONF_OPTS = \
+	--prefix=$(AUTOCONF_PREFIX)
+
+AUTOCONF_OPTS.32 = \
+	$(AUTOCONF_OPTS)
+
+AUTOCONF_OPTS.64 = \
+	$(AUTOCONF_OPTS)
+
+ALL_TGT =
+OVERRIDES =	$(MAKE_VERBOSE)
+
+TARBALL =		$(VER).tar.gz
+TARBALL_COMPRESS =	-z
+TARBALLS =		$(TARBALL)
+
+UNPACK_SENTINEL =	configure
+FROB_SENTINEL.32 =	chmod 755 $(VER.32)/$(UNPACK_SENTINEL)
+FROB_SENTINEL.64 =	chmod 755 $(VER.64)/$(UNPACK_SENTINEL)
+
+PATCHSTRIP =	1
+
+APPLY_PATCHES.32 = \
+	for p in $(PATCHES); do \
+	    echo "Applying $$p"; \
+	    $(GPATCH) -d .unpack32/$(VER) -p$(PATCHSTRIP) < "$$p" || exit 1; \
+	    done
+
+APPLY_PATCHES.64 = \
+	for p in $(PATCHES); do \
+	    echo "Applying $$p"; \
+	    $(GPATCH) -d .unpack64/$(VER) -p$(PATCHSTRIP) < "$$p" || exit 1; \
+	    done
+
+MAKE_CTF =		$(BASE)/../tools/make-ctf
+MAKE_CTF.32 =		$(MAKE_CTF) $(OBJ.32) $(CTF.32) $(VER)
+MAKE_CTF.64 =		$(MAKE_CTF) $(OBJ.64) $(CTF.64) $(VER)
+
+.DEFAULT_GOAL =		all

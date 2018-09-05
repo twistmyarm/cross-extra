@@ -1,0 +1,28 @@
+From b396faf871effba88e99c966bc422507a6334855 Mon Sep 17 00:00:00 2001
+From: Robert Mustacchi <rm@joyent.com>
+Date: Sat, 25 Aug 2018 03:41:49 +0000
+Subject: [PATCH] aarch64 support
+
+---
+ bfd/config.bfd | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/bfd/config.bfd b/bfd/config.bfd
+index 6391f35..5fd8414 100644
+--- a/bfd/config.bfd
++++ b/bfd/config.bfd
+@@ -264,6 +264,11 @@ case "${targ}" in
+     targ_selvecs="aarch64_elf64_le_vec aarch64_elf32_le_vec aarch64_elf32_be_vec arm_elf32_be_vec arm_elf32_le_vec"
+     want64=true
+     ;;
++  aarch64-*-solaris* | aarch64-*-illumos)
++    targ_defvec=aarch64_elf64_le_vec
++    targ_selvecs="aarch64_elf64_be_vec arm_elf32_le_vec arm_elf32_be_vec"
++    want64=true
++    ;;
+   alpha*-*-freebsd* | alpha*-*-kfreebsd*-gnu)
+     targ_defvec=alpha_elf64_fbsd_vec
+     targ_selvecs="alpha_elf64_vec alpha_ecoff_le_vec"
+-- 
+2.2.1
+
