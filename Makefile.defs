@@ -38,7 +38,7 @@ endif
 PATH =		$(STRAPPROTO)/usr/bin:/usr/bin:/usr/sbin:/sbin:/opt/local/bin
 
 MAKE =		gmake
-MAX_JOBS =	128
+MAX_JOBS =	8
 PARALLEL =	-j$(MAX_JOBS)
 MAKE_VERBOSE =	V=1
 GCC.64 =	$(GCC) -m64
@@ -49,8 +49,8 @@ GXX.host =	/opt/local/bin/g++
 GCC.host.64 =	$(GCC.host) -m64
 GXX.host.64 =	$(GXX.host) -m64
 
-LEX = 		/opt/local/bin/lex
-YACC = 		/opt/local/bin/yacc
+LEX = 		lex
+YACC = 		yacc
 GPATCH =	/opt/local/bin/gpatch
 
 SYSINCDIRS =	/usr/include

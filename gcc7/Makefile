@@ -33,6 +33,25 @@ AUTOCONF_OPTS_i86pc = \
 	--enable-languages="c,c++" \
 	--without-gnu-ld
 
+AUTOCONF_OPTS_armv7a= \
+	--target=arm-pc-solaris2.11 \
+	--with-arch=armv7-a \
+	--with-fpu=vfp \
+	--with-float=hard \
+	--with-abi=aapcs-linux \
+	--with-mode=arm \
+	--disable-multilib \
+	--enable-languages="c" \
+	--disable-libssp \
+	--disable-libada \
+	--disable-libgomp \
+	--without-headers \
+	--enable-frame-pointer \
+	--enable-checking=yes \
+	--disable-libgcc \
+	--disable-libcc1 \
+	--disable-libatomic
+
 AUTOCONF_OPTS_armv8 = \
 	--target=aarch64-unknown-elf \
 	--enable-languages="c" \

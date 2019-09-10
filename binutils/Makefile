@@ -28,6 +28,10 @@ include ../Makefile.defs
 i86pc_AUTOCONF_OPTS = \
 	--target=i386-pc-solaris2.11
 
+armv7a_AUTOCONF_OPTS = \
+	--target=arm-*-solaris2.11 \
+	--enable-ld=no
+
 armv8_AUTOCONF_OPTS = \
 	--target=aarch64-unknown-elf
 #	--target=aarch64-*-solaris2.11 \

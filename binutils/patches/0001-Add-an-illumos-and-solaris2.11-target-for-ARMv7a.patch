@@ -1,0 +1,85 @@
+From f907e65841bd5147c53250a6c4c959937d8c5b6a Mon Sep 17 00:00:00 2001
+From: Robert Mustacchi <rm@fingolfin.org>
+Date: Mon, 9 Sep 2019 20:38:23 +0000
+Subject: [PATCH] Add an illumos and solaris2.11 target for ARMv7a
+
+---
+ bfd/config.bfd                 |  2 +-
+ config.sub                     |  2 +-
+ gas/config/te-armillumoseabi.h | 24 ++++++++++++++++++++++++
+ gas/configure.tgt              |  2 ++
+ 4 files changed, 28 insertions(+), 2 deletions(-)
+ create mode 100644 gas/config/te-armillumoseabi.h
+
+diff --git a/bfd/config.bfd b/bfd/config.bfd
+index 5fd84148..f71ee2bd 100644
+--- a/bfd/config.bfd
++++ b/bfd/config.bfd
+@@ -392,7 +392,7 @@ case "${targ}" in
+     targ_selvecs=arm_elf32_be_vec
+     ;;
+   arm-*-elf | arm*-*-freebsd* | arm*-*-linux-* | arm*-*-conix* | \
+-  arm*-*-uclinux* | arm-*-kfreebsd*-gnu | \
++  arm*-*-uclinux* | arm-*-kfreebsd*-gnu | arm-*-illumos | arm-*-solaris* | \
+   arm*-*-eabi* | arm-*-rtems* | arm*-*-uclinuxfdpiceabi)
+     targ_defvec=arm_elf32_le_vec
+     targ_selvecs="arm_elf32_fdpic_le_vec arm_elf32_be_vec arm_elf32_fdpic_be_vec"
+diff --git a/config.sub b/config.sub
+index c95acc68..69d678c1 100755
+--- a/config.sub
++++ b/config.sub
+@@ -1352,7 +1352,7 @@ case $os in
+ 	gnu* | bsd* | mach* | minix* | genix* | ultrix* | irix* \
+ 	     | *vms* | esix* | aix* | cnk* | sunos | sunos[34]*\
+ 	     | hpux* | unos* | osf* | luna* | dgux* | auroraux* | solaris* \
+-	     | sym* | kopensolaris* | plan9* \
++	     | sym* | kopensolaris* | -illumos* | plan9* \
+ 	     | amigaos* | amigados* | msdos* | newsos* | unicos* | aof* \
+ 	     | aos* | aros* | cloudabi* | sortix* \
+ 	     | nindy* | vxsim* | vxworks* | ebmon* | hms* | mvs* \
+diff --git a/gas/config/te-armillumoseabi.h b/gas/config/te-armillumoseabi.h
+new file mode 100644
+index 00000000..47b76980
+--- /dev/null
++++ b/gas/config/te-armillumoseabi.h
+@@ -0,0 +1,24 @@
++/* Copyright (c) 2013, Joyent, Inc.
++
++   This file is part of GAS, the GNU Assembler.
++
++   GAS is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as
++   published by the Free Software Foundation; either version 3,
++   or (at your option) any later version.
++
++   GAS is distributed in the hope that it will be useful, but
++   WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++   the GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with GAS; see the file COPYING.  If not, write to the Free
++   Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA
++   02110-1301, USA.  */
++
++#include "te-solaris.h"
++
++/* The EABI requires the use of VFP.  */
++#define FPU_DEFAULT FPU_ARCH_VFP
++#define EABI_DEFAULT EF_ARM_EABI_VER5
+diff --git a/gas/configure.tgt b/gas/configure.tgt
+index 3d0415c1..ee7563c8 100644
+--- a/gas/configure.tgt
++++ b/gas/configure.tgt
+@@ -147,6 +147,8 @@ case ${generic_target} in
+ 					fmt=elf  em=freebsd ;;
+   arm-*-freebsd* | armeb-*-freebsd*)	fmt=elf  em=armfbsdeabi ;;
+   arm*-*-freebsd*)			fmt=elf  em=armfbsdvfp ;;
++  arm-*-*illumos*)			fmt=elf  em=armillumoseabi ;;
++  arm-*-*solaris*)			fmt=elf  em=armillumoseabi ;;
+   arm-*-linux-*eabi*)			fmt=elf  em=armlinuxeabi ;;
+   arm-*-linux-*)			fmt=elf  em=linux ;;
+   arm-*-uclinux*eabi*)			fmt=elf  em=armlinuxeabi ;;
+-- 
+2.21.0
+

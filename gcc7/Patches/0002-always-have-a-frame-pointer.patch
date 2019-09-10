@@ -1,0 +1,48 @@
+From c9db9b96cb96d73bef64bf5c2e26db01f307d8ec Mon Sep 17 00:00:00 2001
+From: Robert Mustacchi <rm@joyent.com>
+Date: Tue, 20 Aug 2013 00:40:30 -0700
+Subject: [PATCH 2/2] always have a frame pointer
+
+---
+ gcc/config/arm/arm.h  |  4 ++++
+ gcc/config/arm/sol2.h | 11 +++++++++++
+ 2 files changed, 15 insertions(+)
+
+diff --git a/gcc/config/arm/arm.h b/gcc/config/arm/arm.h
+index 25953f53b..63bc2bc03 100644
+--- a/gcc/config/arm/arm.h
++++ b/gcc/config/arm/arm.h
+@@ -885,7 +885,11 @@ extern int arm_arch_cmse;
+    backtrace structures on the stack (if required to do so via a command line
+    option) using r11.  This is the only 'user visible' use of r11 as a frame
+    pointer.  */
++#ifdef	SUBTARGET_ARM_FRAME_POINTER_REGNUM
++#define	ARM_HARD_FRAME_POINTER_REGNUM	SUBTARGET_ARM_FRAME_POINTER_REGNUM
++#else
+ #define ARM_HARD_FRAME_POINTER_REGNUM	11
++#endif  /* SUBTARGET_ARM_FRAME_POINTER_REGNUM */
+ #define THUMB_HARD_FRAME_POINTER_REGNUM	 7
+ 
+ #define HARD_FRAME_POINTER_REGNUM		\
+diff --git a/gcc/config/arm/sol2.h b/gcc/config/arm/sol2.h
+index 93bd41819..ff781f469 100644
+--- a/gcc/config/arm/sol2.h
++++ b/gcc/config/arm/sol2.h
+@@ -85,3 +85,14 @@ extern void arm_print_operand (FILE *, rtx, int);
+ 
+ #define	ENDFILE_ARCH_SPEC	""
+ #define SUBTARGET_CPU_EXTRA_SPECS
++
++/*
++ * XXXARM: Unlike the cool kids we actually kind of care about the frame
++ * pointer. So let's get that going here. We use r9 because that's the register
++ * the EABI says is up to us.
++ */
++#undef	SUBTARGET_FRAME_POINTER_REQUIRED
++#define	SUBTARGET_FRAME_POINTER_REQUIRED	1
++
++#undef	SUBTARGET_ARM_FRAME_POINTER_REGNUM
++#define	SUBTARGET_ARM_FRAME_POINTER_REGNUM	9
+-- 
+2.21.0
+

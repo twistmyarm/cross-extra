@@ -1,0 +1,252 @@
+From 1ea9ba1c2965337498cd9c0f82a37adb06495344 Mon Sep 17 00:00:00 2001
+From: Robert Mustacchi <rm@fingolfin.org>
+Date: Mon, 9 Sep 2019 21:29:56 +0000
+Subject: [PATCH 1/2] XXX Take Rich's old arm for gcc 4.6.3 and attempt to
+ bring it forward
+
+---
+ gcc/config.gcc         | 14 ++++++-
+ gcc/config/arm/arm.c   |  4 +-
+ gcc/config/arm/bpabi.h |  2 +-
+ gcc/config/arm/elf.h   |  2 +-
+ gcc/config/arm/sol2.h  | 87 ++++++++++++++++++++++++++++++++++++++++++
+ gcc/config/arm/t-sol2  |  5 +++
+ gcc/config/sol2.h      |  4 +-
+ libgcc/config.host     |  6 +++
+ 8 files changed, 117 insertions(+), 7 deletions(-)
+ create mode 100644 gcc/config/arm/sol2.h
+ create mode 100644 gcc/config/arm/t-sol2
+
+diff --git a/gcc/config.gcc b/gcc/config.gcc
+index 6e75bd45f..a066f3a7b 100644
+--- a/gcc/config.gcc
++++ b/gcc/config.gcc
+@@ -874,7 +874,7 @@ case ${target} in
+   tmake_file="${tmake_file} t-sol2 t-slibgcc"
+   c_target_objs="${c_target_objs} sol2-c.o"
+   cxx_target_objs="${cxx_target_objs} sol2-c.o sol2-cxx.o"
+-  extra_objs="sol2.o sol2-stubs.o"
++  extra_objs="${extra_objs} sol2.o sol2-stubs.o"
+   extra_options="${extra_options} sol2.opt"
+   case ${enable_threads}:${have_pthread_h}:${have_thread_h} in
+     "":yes:* | yes:yes:* )
+@@ -1133,7 +1133,7 @@ arm*-*-phoenix*)
+ 	tmake_file="${tmake_file} arm/t-arm arm/t-bpabi arm/t-phoenix"
+ 	target_cpu_cname="arm7tdmi"
+ 	;;
+-arm*-*-eabi* | arm*-*-symbianelf* | arm*-*-rtems* | arm*-*-fuchsia*)
++arm*-*-eabi* | arm*-*-symbianelf* | arm*-*-rtems* | arm*-*-fuchsia* | arm*-*-solaris*)
+ 	case ${target} in
+ 	arm*eb-*-eabi*)
+ 	  tm_defines="${tm_defines} TARGET_BIG_ENDIAN_DEFAULT=1"
+@@ -1143,6 +1143,16 @@ arm*-*-eabi* | arm*-*-symbianelf* | arm*-*-rtems* | arm*-*-fuchsia*)
+ 	tmake_file="${tmake_file} arm/t-arm arm/t-arm-elf"
+ 	target_cpu_cname="arm7tdmi"
+ 	case ${target} in
++	arm*-*-solaris*)
++	  tm_file="$tm_file arm/sol2.h sol2.h"
++	  tmake_file="${tmake_file} arm/t-bpabi t-sol2 t-svr4 arm/t-sol2"
++	  use_gcc_stdint=wrap
++	  c_target_objs="${c_target_objs} sol2-c.o"
++	  cxx_target_objs="${cxx_target_objs} sol2-c.o"
++	  extra_objs="${extra_objs} sol2.o"
++	  tm_p_file="${tm_p_file} sol2-protos.h"
++	  tm_file="${tm_file} tm-dwarf2.h"
++	  ;;
+ 	arm*-*-eabi*)
+ 	  tm_file="$tm_file newlib-stdint.h"
+ 	  tmake_file="${tmake_file} arm/t-bpabi"
+diff --git a/gcc/config/arm/arm.c b/gcc/config/arm/arm.c
+index 7b3f4c101..b01e29b42 100644
+--- a/gcc/config/arm/arm.c
++++ b/gcc/config/arm/arm.c
+@@ -103,7 +103,7 @@ static int thumb_far_jump_used_p (void);
+ static bool thumb_force_lr_save (void);
+ static unsigned arm_size_return_regs (void);
+ static bool arm_assemble_integer (rtx, unsigned int, int);
+-static void arm_print_operand (FILE *, rtx, int);
++void arm_print_operand (FILE *, rtx, int);
+ static void arm_print_operand_address (FILE *, machine_mode, rtx);
+ static bool arm_print_operand_punct_valid_p (unsigned char code);
+ static const char *fp_const_from_val (REAL_VALUE_TYPE *);
+@@ -21765,7 +21765,7 @@ arm_print_condition (FILE *stream)
+    before output.
+    If CODE is 'B' then output a bitwise inverted value of X (a const int).
+    If X is a REG and CODE is `M', output a ldm/stm style multi-reg.  */
+-static void
++void
+ arm_print_operand (FILE *stream, rtx x, int code)
+ {
+   switch (code)
+diff --git a/gcc/config/arm/bpabi.h b/gcc/config/arm/bpabi.h
+index f9f9a9248..79d7d7046 100644
+--- a/gcc/config/arm/bpabi.h
++++ b/gcc/config/arm/bpabi.h
+@@ -155,7 +155,7 @@
+ #define BPABI_LINK_SPEC \
+   "%{mbig-endian:-EB} %{mlittle-endian:-EL} "		\
+   "%{static:-Bstatic} %{shared:-shared} %{symbolic:-Bsymbolic} "	\
+-  "-X" SUBTARGET_EXTRA_LINK_SPEC EABI_LINK_SPEC
++  SUBTARGET_EXTRA_LINK_SPEC EABI_LINK_SPEC
+ 
+ #undef  LINK_SPEC
+ #define LINK_SPEC BPABI_LINK_SPEC
+diff --git a/gcc/config/arm/elf.h b/gcc/config/arm/elf.h
+index f119b8711..5cc899ca7 100644
+--- a/gcc/config/arm/elf.h
++++ b/gcc/config/arm/elf.h
+@@ -99,7 +99,7 @@
+     && !target_pure_code)
+ 
+ #ifndef LINK_SPEC
+-#define LINK_SPEC "%{mbig-endian:-EB} %{mlittle-endian:-EL} -X"
++#define LINK_SPEC "%{mbig-endian:-EB} %{mlittle-endian:-EL}"
+ #endif
+   
+ /* Run-time Target Specification.  */
+diff --git a/gcc/config/arm/sol2.h b/gcc/config/arm/sol2.h
+new file mode 100644
+index 000000000..93bd41819
+--- /dev/null
++++ b/gcc/config/arm/sol2.h
+@@ -0,0 +1,87 @@
++#include <stdio.h>
++
++extern void arm_print_operand (FILE *, rtx, int);
++
++#define TARGET_SUN_TLS 1
++
++#define ASM_OUTPUT_CALL(FILE, FN)				\
++  do {								\
++    fprintf (FILE, "\tbl\t");					\
++    arm_print_operand (FILE, XEXP (DECL_RTL (FN), 0), 0);	\
++    fprintf (FILE, "\n");					\
++  } while (0)
++
++/*
++ * XXXARM: We're re-defining this to the default ARM-y value, because sol2.h
++ * makes it Sun as-y, which of course we'll never have.
++ */
++#undef ASM_SPEC
++#define ASM_SPEC "\
++%{mbig-endian:-EB} \
++%{mlittle-endian:-EL} \
++%{mcpu=*:-mcpu=%*} \
++%{march=*:-march=%*} \
++%{mapcs-*:-mapcs-%*} \
++%(subtarget_asm_float_spec) \
++%{mthumb-interwork:-mthumb-interwork} \
++%{msoft-float:-mfloat-abi=soft} %{mhard-float:-mfloat-abi=hard} \
++%{mfloat-abi=*} %{mfpu=*} \
++%(subtarget_extra_asm_spec)"
++
++/*
++ * XXXARM: Probably a huge mistake
++ *
++ * Otherwise, with this enabled, we end up needing symbols that don't
++ * exist while building libgcc2.
++ */
++/*
++ * XXX Doesn't seem to work
++#undef ENABLE_EXECUTE_STACK
++*/
++
++/* This is how to declare the size of a function.  For Solaris, we output
++   any .init or .fini entries here.  */
++#undef ASM_DECLARE_FUNCTION_SIZE
++#define ASM_DECLARE_FUNCTION_SIZE(FILE, FNAME, DECL)		\
++  do								\
++    {								\
++      ARM_OUTPUT_FN_UNWIND (FILE, FALSE);			\
++      if (!flag_inhibit_size_directive)				\
++	ASM_OUTPUT_MEASURED_SIZE (FILE, FNAME);			\
++      solaris_output_init_fini (FILE, DECL);			\
++    }								\
++  while (0)
++
++#undef TARGET_OS_CPP_BUILTINS
++#define TARGET_OS_CPP_BUILTINS()		\
++  do 						\
++    {						\
++      TARGET_BPABI_CPP_BUILTINS();		\
++      SOL_TARGET_OS_CPP_BUILTINS();		\
++    }						\
++  while (false)
++
++
++#undef	TARGET_DEFAULT_FLOAT_ABI
++#define	TARGET_DEFAULT_FLOAT_ABI	ARM_FLOAT_ABI_HARD
++
++#undef	ARM_DEFAULT_ABI
++#define	ARM_DEFAULT_ABI	ARM_ABI_AAPCS_LINUX
++
++#undef	SUBTARGET_ARCH_DEFAULT
++#define	SUBTARGET_ARCH_DEFAULT
++
++/* XXXARM: Something we can do to disable interwork? */
++/* XXXARM: Something we can do to default arm11/armv6? */
++
++/* XXX We need to indicate to sol2.h that we're not building a 64-bit target.
++ * Which we're not when doing ARM. Unfortunately gcc/config/arm/arm.h is
++ * included after the general sol2.h so I guess this is what we've got. It
++ * actually expects a kind of general multilib thing, so that's awkward. Oh
++ * well. */
++#define	TARGET_64BIT	0
++#define	ARCH64_SUBDIR	"arm64"
++#define DEFAULT_ARCH32_P 1
++
++#define	ENDFILE_ARCH_SPEC	""
++#define SUBTARGET_CPU_EXTRA_SPECS
+diff --git a/gcc/config/arm/t-sol2 b/gcc/config/arm/t-sol2
+new file mode 100644
+index 000000000..708c6368f
+--- /dev/null
++++ b/gcc/config/arm/t-sol2
+@@ -0,0 +1,5 @@
++UNWIND_H = $(srcdir)/config/arm/unwind-arm.h
++LIB2ADDEH = $(srcdir)/config/arm/unwind-arm.c \
++  $(srcdir)/config/arm/libunwind.S \
++  $(srcdir)/config/arm/pr-support.c $(srcdir)/unwind-c.c
++LIB2ADDEHDEP = $(UNWIND_H) $(srcdir)/config/$(LIB1ASMSRC)
+diff --git a/gcc/config/sol2.h b/gcc/config/sol2.h
+index f3e6140d9..394d9b2a8 100644
+--- a/gcc/config/sol2.h
++++ b/gcc/config/sol2.h
+@@ -81,7 +81,7 @@ along with GCC; see the file COPYING3.  If not see
+ 
+ /* Names to predefine in the preprocessor for this target machine.  */
+ #define TARGET_SUB_OS_CPP_BUILTINS()
+-#define TARGET_OS_CPP_BUILTINS()			\
++#define SOL_TARGET_OS_CPP_BUILTINS()			\
+   do {							\
+     builtin_define_std ("unix");			\
+     builtin_define_std ("sun");				\
+@@ -118,6 +118,8 @@ along with GCC; see the file COPYING3.  If not see
+     TARGET_SUB_OS_CPP_BUILTINS();			\
+   } while (0)
+ 
++#define		TARGET_OS_CPP_BUILTINS()	SOL_TARGET_OS_CPP_BUILTINS()
++
+ #define SUBTARGET_OVERRIDE_OPTIONS			\
+   do {							\
+     solaris_override_options ();			\
+diff --git a/libgcc/config.host b/libgcc/config.host
+index 0238efb9a..587817a89 100644
+--- a/libgcc/config.host
++++ b/libgcc/config.host
+@@ -267,6 +267,12 @@ case ${host} in
+   tmake_file="$tmake_file t-rtems"
+   extra_parts="crtbegin.o crtend.o"
+   ;;
++arm*-*-solaris2*)
++	# XXX: needs t-sol2 to work? Also, really wants to be a thing
++	# down below
++	# XXX: We want to provied the same runtime objs as we do for i386, also?
++	# extra_parts="crt1.o crti.o crtn.o gcrt1.o gmon.o crtbegin.o crtend.o"
++	;;
+ *-*-solaris2*)
+   # Unless linker support and dl_iterate_phdr are present,
+   # unwind-dw2-fde-dip.c automatically falls back to unwind-dw2-fde.c.
+-- 
+2.21.0
+

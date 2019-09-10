@@ -17,7 +17,7 @@
 # To build everything just run 'gmake' in this directory.
 #
 
-ARCHS =		i86pc armv8 riscv
+ARCHS =		armv7a #armv8 riscv
 NATIVE_ARCH =	$(shell uname -i)
 ALT_ARCHS =	$(filter-out $(NATIVE_ARCH),$(ARCHS))
 NATIVE_DESTDIR=	$(BASE_DESTDIR)/$(NATIVE_ARCH)
@@ -51,23 +51,8 @@ NATIVE_TARGET_SUBDIRS= \
 
 all: strap
 
-#
-# We're doing this the max power way... XXX swap around native for ALT
-# at some point.
-#
-strap.host:
-	for d in $(NATIVE_TARGET_SUBDIRS); do \
-		(cd $$d && \
-		    STRAP=$(STRAP) \
-		    PKG_CONFIG_LIBDIR="" \
-		    NATIVE_ARCH=$(NATIVE_ARCH) \
-		    ARCH=$(NATIVE_ARCH) \
-		    $(MAKE) install); \
-	done; \
-
-
-strap: strap.host
-	for arch in $(ALT_ARCHS) ; do \
+strap:
+	for arch in $(ARCHS) ; do \
 		for d in $(NATIVE_TARGET_SUBDIRS); do \
 			(cd $$d && \
 			    STRAP=$(STRAP) \
