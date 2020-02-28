@@ -1,0 +1,13 @@
+awk(1) on OmniOS at least is old awk, which is unable to parse this script.
+
+--- ./gcc/config/aarch64/geniterators.sh.orig	Fri Feb 28 18:30:02 2020
++++ ./gcc/config/aarch64/geniterators.sh	Fri Feb 28 18:30:13 2020
+@@ -24,7 +24,7 @@
+ # same set of modes as the iterator in iterators.md
+ #
+ # Find the <ITERATOR> definitions (may span several lines).
+-LC_ALL=C awk '
++LC_ALL=C nawk '
+ BEGIN {
+ 	print "/* -*- buffer-read-only: t -*- */"
+ 	print "/* Generated automatically by geniterators.sh from iterators.md.  */"
