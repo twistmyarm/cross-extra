@@ -22,6 +22,19 @@ PREFIX =	/usr/gcc/7
 
 include ../Makefile.defs
 
+MPFR_TAR =	$(MPFR_VER).tar.bz2
+GMP_TAR =	$(GMP_VER).tar.bz2
+MPC_TAR =	$(MPC_VER).tar.gz
+NEWLIB_TAR =	$(NEWLIB_VER).tar.gz
+
+TARBALLS = $(TARBALL) $(MPFR_TAR) $(GMP_TAR) $(MPC_TAR) $(NEWLIB_TAR)
+
+FETCH_URL.$(TARBALL) =		https://github.com/illumos/gcc/archive
+FETCH_URL.$(MPFR_TAR) =		https://ftp.gnu.org/gnu/mpfr
+FETCH_URL.$(GMP_TAR) =		https://ftp.gnu.org/gnu/gmp
+FETCH_URL.$(MPC_TAR) =		https://ftp.gnu.org/gnu/mpc
+FETCH_URL.$(NEWLIB_TAR) =	ftp://sourceware.org/pub/newlib
+
 SEPARATE_BUILD =	yes
 
 GCC =	/opt/local/bin/gcc
@@ -130,21 +143,6 @@ include ../Makefile.targ
 include ../Makefile.targ.autoconf
 
 #
-# To reduce repository size, the source files are stored in Manta and
-# need to be downloaded.
-#
-$(TARBALL) $(MPFR_VER).tar.bz2 $(GMP_VER).tar.bz2 $(MPC_VER).tar.gz:
-	if [[ ! -f $@.sha1 ]]; then \
-		echo "Missing required digest file!"; \
-		exit 1; \
-	fi; \
-	curl -o $@.tmp $(FETCH_BASE)/$@
-	digest -a sha1 $@.tmp > $@.tmp.sha1
-	cmp -s $@.sha1 $@.tmp.sha1
-	rm -f $@.tmp.sha1
-	mv $@.tmp $@
-
-#
 # We could use the mpfr and gmp from the build system (since the compiler will
 # be run here), but there's no good way to make gcc build itself correctly if
 # we do.  There are two main problems:
@@ -165,37 +163,37 @@ $(TARBALL) $(MPFR_VER).tar.bz2 $(GMP_VER).tar.bz2 $(MPC_VER).tar.gz:
 #$(AUTOCONF_OUT.32): | $(VER.32)/mpfr $(VER.32)/gmp $(VER.32)/mpc $(VER.32)/newlib
 $(AUTOCONF_OUT.32): | $(VER.32)/mpfr $(VER.32)/gmp $(VER.32)/mpc
 
-$(VER.32)/newlib: $(NEWLIB_VER).tar.gz | $(VER.32)
+$(VER.32)/newlib: $(NEWLIB_TAR) | $(VER.32)
 	-rm -rf $@
 	mkdir -p .unpack32
-	gtar x -C .unpack32 -z --no-same-owner -f $(NEWLIB_VER).tar.gz
+	gtar x -C .unpack32 -z --no-same-owner -f $(NEWLIB_TAR)
 	mv -f .unpack32/$(NEWLIB_VER) ./$@
 	-rmdir .unpack32
 	chmod 755 $@/configure
 	touch $@/configure
 
-$(VER.32)/mpfr: $(MPFR_VER).tar.bz2 | $(VER.32)
+$(VER.32)/mpfr: $(MPFR_TAR) | $(VER.32)
 	-rm -rf $@
 	mkdir -p .unpack32
-	gtar x -C .unpack32 -j --no-same-owner -f $(MPFR_VER).tar.bz2
+	gtar x -C .unpack32 -j --no-same-owner -f $(MPFR_TAR)
 	mv -f .unpack32/$(MPFR_VER) ./$@
 	-rmdir .unpack32
 	chmod 755 $@/configure
 	touch $@/configure
 
-$(VER.32)/gmp: $(GMP_VER).tar.bz2 | $(VER.32)
+$(VER.32)/gmp: $(GMP_TAR) | $(VER.32)
 	-rm -rf $@
 	mkdir -p .unpack32
-	gtar x -C .unpack32 -j --no-same-owner -f $(GMP_VER).tar.bz2
+	gtar x -C .unpack32 -j --no-same-owner -f $(GMP_TAR)
 	mv -f .unpack32/$(GMP_VER) ./$@
 	-rmdir .unpack32
 	chmod 755 $@/configure
 	touch $@/configure
 
-$(VER.32)/mpc: $(MPC_VER).tar.gz | $(VER.32)
+$(VER.32)/mpc: $(MPC_TAR) | $(VER.32)
 	-rm -rf $@
 	mkdir -p .unpack32
-	gtar x -C .unpack32 -z --no-same-owner -f $(MPC_VER).tar.gz
+	gtar x -C .unpack32 -z --no-same-owner -f $(MPC_TAR)
 	mv -f .unpack32/$(MPC_VER) ./$@
 	-rmdir .unpack32
 	chmod 755 $@/configure

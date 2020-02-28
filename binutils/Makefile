@@ -25,6 +25,8 @@ VER =	binutils-2.31.1
 
 include ../Makefile.defs
 
+FETCH_URL.$(TARBALL) =	https://ftp.gnu.org/gnu/binutils
+
 i86pc_AUTOCONF_OPTS = \
 	--target=i386-pc-solaris2.11
 
