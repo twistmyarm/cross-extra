@@ -141,6 +141,11 @@ TARBALL =		$(VER).tar.gz
 TARBALL_COMPRESS =	-z
 TARBALLS =		$(TARBALL)
 
+#
+# Sometimes the unpacked directory does not match the compressed filename.
+#
+VER_UNPACKED =		$(VER)
+
 UNPACK_SENTINEL =	configure
 FROB_SENTINEL.32 =	chmod 755 $(VER.32)/$(UNPACK_SENTINEL)
 FROB_SENTINEL.64 =	chmod 755 $(VER.64)/$(UNPACK_SENTINEL)
@@ -150,13 +155,13 @@ PATCHSTRIP =	1
 APPLY_PATCHES.32 = \
 	for p in $(PATCHES); do \
 	    echo "Applying $$p"; \
-	    $(GPATCH) -d .unpack32/$(VER) -p$(PATCHSTRIP) < "$$p" || exit 1; \
+	    $(GPATCH) -d .unpack32/$(VER_UNPACKED) -p$(PATCHSTRIP) < "$$p" || exit 1; \
 	    done
 
 APPLY_PATCHES.64 = \
 	for p in $(PATCHES); do \
 	    echo "Applying $$p"; \
-	    $(GPATCH) -d .unpack64/$(VER) -p$(PATCHSTRIP) < "$$p" || exit 1; \
+	    $(GPATCH) -d .unpack64/$(VER_UNPACKED) -p$(PATCHSTRIP) < "$$p" || exit 1; \
 	    done
 
 MAKE_CTF =		$(BASE)/../tools/make-ctf

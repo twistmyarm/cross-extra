@@ -73,7 +73,7 @@ $(VER.32)/$(UNPACK_SENTINEL): $(TARBALL)
 	mkdir -p .unpack32
 	gtar x -C .unpack32 $(TARBALL_COMPRESS) --no-same-owner -f $(TARBALL)
 	$(APPLY_PATCHES.32)
-	mv -f .unpack32/$(VER) ./$(VER.32)
+	mv -f .unpack32/$(VER_UNPACKED) ./$(VER.32)
 	-rmdir .unpack32
 	$(FROB_SENTINEL.32)
 	touch $(VER.32)/$(UNPACK_SENTINEL)
@@ -83,7 +83,7 @@ $(VER.64)/$(UNPACK_SENTINEL): $(TARBALL)
 	mkdir -p .unpack64
 	gtar x -C .unpack64 $(TARBALL_COMPRESS) --no-same-owner -f $(TARBALL)
 	$(APPLY_PATCHES.64)
-	mv -f .unpack64/$(VER) ./$(VER.64)
+	mv -f .unpack64/$(VER_UNPACKED) ./$(VER.64)
 	-rmdir .unpack64
 	$(FROB_SENTINEL.64)
 	touch $(VER.64)/$(UNPACK_SENTINEL)

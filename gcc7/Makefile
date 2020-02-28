@@ -29,6 +29,9 @@ NEWLIB_TAR =	$(NEWLIB_VER).tar.gz
 
 TARBALLS = $(TARBALL) $(MPFR_TAR) $(GMP_TAR) $(MPC_TAR) $(NEWLIB_TAR)
 
+# Github tarballs contain an extra leading gcc- for some reason.
+VER_UNPACKED =	gcc-$(VER)
+
 FETCH_URL.$(TARBALL) =		https://github.com/illumos/gcc/archive
 FETCH_URL.$(MPFR_TAR) =		https://ftp.gnu.org/gnu/mpfr
 FETCH_URL.$(GMP_TAR) =		https://ftp.gnu.org/gnu/gmp
