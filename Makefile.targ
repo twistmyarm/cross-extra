@@ -61,30 +61,30 @@ install_autoconf_64: all
 $(AUTOCONF_OUT.32): $(VER.32)/configure | $(OBJ.32)
 	(cd $(OBJ.32); \
 	    env - PATH=$(PATH) $(AUTOCONF_ENV) \
-	    $(SEPARATE_BUILD:yes=../$(VER.32)/)./configure $(AUTOCONF_OPTS.32))
+	    $(SEPARATE_BUILD:yes=$(VER.32)/)./configure $(AUTOCONF_OPTS.32))
 
 $(AUTOCONF_OUT.64): $(VER.64)/configure | $(OBJ.64)
-	(cd $(VER.64); \
+	(cd $(OBJ.64); \
 	    env - PATH=$(PATH) $(AUTOCONF_ENV.64) \
-	    $(SEPARATE_BUILD:yes=../$(VER.64)/)./configure $(AUTOCONF_OPTS.64))
+	    $(SEPARATE_BUILD:yes=$(VER.64)/)./configure $(AUTOCONF_OPTS.64))
 
 $(VER.32)/$(UNPACK_SENTINEL): $(TARBALL)
-	-rm -rf $(VER.32) $(OBJ.32)
-	mkdir -p .unpack32
-	gtar x -C .unpack32 $(TARBALL_COMPRESS) --no-same-owner -f $(TARBALL)
+	-rm -rf $(VER.32) $(OBJ.32) $(UNPACK.32)
+	mkdir -p $(UNPACK.32)
+	gtar x -C $(UNPACK.32) $(TARBALL_COMPRESS) --no-same-owner -f $(TARBALL)
 	$(APPLY_PATCHES.32)
-	mv -f .unpack32/$(VER_UNPACKED) ./$(VER.32)
-	-rmdir .unpack32
+	mv -f $(UNPACK.32)/$(VER_UNPACKED) $(VER.32)
+	-rmdir $(UNPACK.32)
 	$(FROB_SENTINEL.32)
 	touch $(VER.32)/$(UNPACK_SENTINEL)
 
 $(VER.64)/$(UNPACK_SENTINEL): $(TARBALL)
-	-rm -rf $(VER.64) $(OBJ.64)
-	mkdir -p .unpack64
-	gtar x -C .unpack64 $(TARBALL_COMPRESS) --no-same-owner -f $(TARBALL)
+	-rm -rf $(VER.64) $(OBJ.64) $(UNPACK.64)
+	mkdir -p $(UNPACK.64)
+	gtar x -C $(UNPACK.64) $(TARBALL_COMPRESS) --no-same-owner -f $(TARBALL)
 	$(APPLY_PATCHES.64)
-	mv -f .unpack64/$(VER_UNPACKED) ./$(VER.64)
-	-rmdir .unpack64
+	mv -f $(UNPACK.64)/$(VER_UNPACKED) $(VER.64)
+	-rmdir $(UNPACK.64)
 	$(FROB_SENTINEL.64)
 	touch $(VER.64)/$(UNPACK_SENTINEL)
 
@@ -95,6 +95,6 @@ $(VER.64).build: $(VER.64)/$(UNPACK_SENTINEL)
 	mkdir -p "$@"
 
 clean:
-	-rm -rf $(VER) $(VER.32) $(VER.64) .unpack32 .unpack64 $(CLEANFILES) \
+	-rm -rf $(VER) $(VER.32) $(VER.64) $(UNPACK.32) $(UNPACK.64) $(CLEANFILES) \
 	    $(VER.32)strap $(VER.64)strap $(OBJ.32) $(OBJ.64) \
 	    $(CTF.32) $(CTF.64)
