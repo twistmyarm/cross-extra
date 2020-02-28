@@ -41,6 +41,7 @@ AUTOCONF_OPTS = \
 	--prefix=/usr/gnu \
 	--enable-64-bit-bfd \
 	--program-prefix=g \
+	--disable-nls \
 	$($(ARCH)_AUTOCONF_OPTS)
 
 PATCHES =	patches/*
