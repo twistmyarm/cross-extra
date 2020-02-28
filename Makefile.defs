@@ -14,10 +14,13 @@
 #
 
 BASE =		$(PWD)
+WORKDIR =	$(BASE)
 DESTDIR =	$(BASE)/../proto/$(ARCH)
 NATIVE_DESTDIR =	$(BASE)/../proto/$(NATIVE_ARCH)
-VER.32 =	$(VER)-$(ARCH)-32$(STRAP)
-VER.64 =	$(VER)-$(ARCH)-64$(STRAP)
+VER.32 =	$(WORKDIR)/$(VER)-$(ARCH)-32$(STRAP)
+VER.64 =	$(WORKDIR)/$(VER)-$(ARCH)-64$(STRAP)
+UNPACK.32 =	$(WORKDIR)/.unpack-$(VER)-32
+UNPACK.64 =	$(WORKDIR)/.unpack-$(VER)-64
 OBJ.32 =	$(VER.32)$(SEPARATE_BUILD:yes=.build)
 OBJ.64 =	$(VER.64)$(SEPARATE_BUILD:yes=.build)
 CTF.32 =	ctfobjects-$(ARCH)-32$(STRAP)
@@ -155,13 +158,13 @@ PATCHSTRIP =	1
 APPLY_PATCHES.32 = \
 	for p in $(PATCHES); do \
 	    echo "Applying $$p"; \
-	    $(GPATCH) -d .unpack32/$(VER_UNPACKED) -p$(PATCHSTRIP) < "$$p" || exit 1; \
+	    $(GPATCH) -d $(UNPACK.32)/$(VER_UNPACKED) -p$(PATCHSTRIP) < "$$p" || exit 1; \
 	    done
 
 APPLY_PATCHES.64 = \
 	for p in $(PATCHES); do \
 	    echo "Applying $$p"; \
-	    $(GPATCH) -d .unpack64/$(VER_UNPACKED) -p$(PATCHSTRIP) < "$$p" || exit 1; \
+	    $(GPATCH) -d $(UNPACK.64)/$(VER_UNPACKED) -p$(PATCHSTRIP) < "$$p" || exit 1; \
 	    done
 
 MAKE_CTF =		$(BASE)/../tools/make-ctf

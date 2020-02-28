@@ -168,37 +168,37 @@ $(AUTOCONF_OUT.32): | $(VER.32)/mpfr $(VER.32)/gmp $(VER.32)/mpc
 
 $(VER.32)/newlib: $(NEWLIB_TAR) | $(VER.32)
 	-rm -rf $@
-	mkdir -p .unpack32
-	gtar x -C .unpack32 -z --no-same-owner -f $(NEWLIB_TAR)
-	mv -f .unpack32/$(NEWLIB_VER) ./$@
-	-rmdir .unpack32
+	mkdir -p $(WORKDIR)/.unpack32
+	gtar x -C $(WORKDIR)/.unpack32 -z --no-same-owner -f $(NEWLIB_TAR)
+	mv -f $(WORKDIR)/.unpack32/$(NEWLIB_VER) $@
+	-rmdir $(WORKDIR)/.unpack32
 	chmod 755 $@/configure
 	touch $@/configure
 
 $(VER.32)/mpfr: $(MPFR_TAR) | $(VER.32)
 	-rm -rf $@
-	mkdir -p .unpack32
-	gtar x -C .unpack32 -j --no-same-owner -f $(MPFR_TAR)
-	mv -f .unpack32/$(MPFR_VER) ./$@
-	-rmdir .unpack32
+	mkdir -p $(WORKDIR)/.unpack32
+	gtar x -C $(WORKDIR)/.unpack32 -j --no-same-owner -f $(MPFR_TAR)
+	mv -f $(WORKDIR)/.unpack32/$(MPFR_VER) $@
+	-rmdir $(WORKDIR)/.unpack32
 	chmod 755 $@/configure
 	touch $@/configure
 
 $(VER.32)/gmp: $(GMP_TAR) | $(VER.32)
 	-rm -rf $@
-	mkdir -p .unpack32
-	gtar x -C .unpack32 -j --no-same-owner -f $(GMP_TAR)
-	mv -f .unpack32/$(GMP_VER) ./$@
-	-rmdir .unpack32
+	mkdir -p $(WORKDIR)/.unpack32
+	gtar x -C $(WORKDIR)/.unpack32 -j --no-same-owner -f $(GMP_TAR)
+	mv -f $(WORKDIR)/.unpack32/$(GMP_VER) $@
+	-rmdir $(WORKDIR)/.unpack32
 	chmod 755 $@/configure
 	touch $@/configure
 
 $(VER.32)/mpc: $(MPC_TAR) | $(VER.32)
 	-rm -rf $@
-	mkdir -p .unpack32
-	gtar x -C .unpack32 -z --no-same-owner -f $(MPC_TAR)
-	mv -f .unpack32/$(MPC_VER) ./$@
-	-rmdir .unpack32
+	mkdir -p $(WORKDIR)/.unpack32
+	gtar x -C $(WORKDIR)/.unpack32 -z --no-same-owner -f $(MPC_TAR)
+	mv -f $(WORKDIR)/.unpack32/$(MPC_VER) $@
+	-rmdir $(WORKDIR)/.unpack32
 	chmod 755 $@/configure
 	touch $@/configure
 
