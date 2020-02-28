@@ -26,7 +26,7 @@ $(TARBALLS):
 		echo "Missing required digest file!"; \
 		exit 1; \
 	fi; \
-	curl -o $@.tmp $(FETCH_BASE)/$@
+	curl -Lo $@.tmp $(FETCH_URL.$@)/$@
 	digest -a sha1 $@.tmp > $@.tmp.sha1
 	cmp -s $@.sha1 $@.tmp.sha1
 	rm -f $@.tmp.sha1

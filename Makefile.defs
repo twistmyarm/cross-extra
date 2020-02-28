@@ -23,8 +23,6 @@ OBJ.64 =	$(VER.64)$(SEPARATE_BUILD:yes=.build)
 CTF.32 =	ctfobjects-$(ARCH)-32$(STRAP)
 CTF.64 =	ctfobjects-$(ARCH)-64$(STRAP)
 
-FETCH_BASE =	https://us-east.manta.joyent.com/rmustacc/public/cross-extra
-
 ifeq ($(STRAP),strap)
 STRAPPROTO =	$(DESTDIR)
 GCC =		$(DESTDIR)/usr/gcc/4/bin/gcc
