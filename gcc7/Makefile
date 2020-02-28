@@ -13,7 +13,7 @@
 # Copyright (c) 2018, Joyent, Inc.
 #
 
-VER =		gcc-7.3.0-il-1
+VER =		gcc-7.4.0-il-1
 MPFR_VER =	mpfr-3.1.6
 GMP_VER =	gmp-6.1.2
 MPC_VER =	mpc-1.0.3
