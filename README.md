@@ -15,7 +15,7 @@ provision a pkgsrc zone.  Once running, you will need to install the following
 software inside:
 
 ```bash
-$ pkgin install byacc flex gcc7 gmake gtar patch
+$ pkgin install flex gcc7 gmake gtar patch smartos-build-tools
 ```
 
 Finally, you can build the toolchains by simply running `gmake` from within a
