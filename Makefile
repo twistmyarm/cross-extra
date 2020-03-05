@@ -51,23 +51,8 @@ NATIVE_TARGET_SUBDIRS= \
 
 all: strap
 
-#
-# We're doing this the max power way... XXX swap around native for ALT
-# at some point.
-#
-strap.host:
-	for d in $(NATIVE_TARGET_SUBDIRS); do \
-		(cd $$d && \
-		    STRAP=$(STRAP) \
-		    PKG_CONFIG_LIBDIR="" \
-		    NATIVE_ARCH=$(NATIVE_ARCH) \
-		    ARCH=$(NATIVE_ARCH) \
-		    $(MAKE) install); \
-	done; \
-
-
-strap: strap.host
-	for arch in $(ALT_ARCHS) ; do \
+strap:
+	for arch in $(ARCHS); do \
 		for d in $(NATIVE_TARGET_SUBDIRS); do \
 			(cd $$d && \
 			    STRAP=$(STRAP) \
@@ -79,12 +64,3 @@ strap: strap.host
 	done
 
 .PHONY: strap world
-
-#NATIVE_SUBDIRS= \
-#	binutils \
-#	gcc6 \
-#	cpp \
-#	libz \
-#	make
-
-
