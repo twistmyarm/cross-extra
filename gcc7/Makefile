@@ -48,7 +48,8 @@ AUTOCONF_OPTS_i86pc = \
 	--host=i386-pc-solaris2.11 \
 	--build=i386-pc-solaris2.11 \
 	--target=i386-pc-solaris2.11 \
-	--enable-languages="c,c++"
+	--enable-languages="c,c++" \
+	--disable-bootstrap
 
 AUTOCONF_OPTS_armv8 = \
 	--target=aarch64-unknown-elf \
