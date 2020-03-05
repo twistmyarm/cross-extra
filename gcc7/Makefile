@@ -45,9 +45,10 @@ GXX =	/opt/local/bin/g++
 CFLAGS = -g -O2
 
 AUTOCONF_OPTS_i86pc = \
+	--host=i386-pc-solaris2.11 \
+	--build=i386-pc-solaris2.11 \
 	--target=i386-pc-solaris2.11 \
-	--enable-languages="c,c++" \
-	--without-gnu-ld
+	--enable-languages="c,c++"
 
 AUTOCONF_OPTS_armv8 = \
 	--target=aarch64-unknown-elf \
@@ -77,20 +78,19 @@ AUTOCONF_OPTS += \
 
 AUTOCONF_ENV += \
 	DESTDIR=$(DESTDIR) \
-	MAKE=$(MAKE)
+	MAKE=$(MAKE) \
+	AR_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/gar \
+	AS_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/gas \
+	NM_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/gnm \
+	OBJDUMP_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/gobjdump \
+	OBJCOPY_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/gobjcopy \
+	RANLIB_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/granlib \
+	READELF_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/readelf
 
 ifneq ($(ARCH),$(NATIVE_ARCH))
 AUTOCONF_ENV += \
-	AR_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/gar \
-	AS_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/gas \
-        NM_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/gnm \
-        LD_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/gld \
-        OBJDUMP_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/gobjdump \
-        OBJCOPY_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/gobjcopy \
-        RANLIB_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/granlib \
-	READELF_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/readelf
+	LD_FOR_TARGET=$(DESTDIR)/usr/gnu/bin/gld
 endif
-
 
 OVERRIDES += \
 	$(AUTOCONF_CFLAGS) \
@@ -140,7 +140,6 @@ AUTOCONF_LIBS =
 GENLDFLAGS =
 
 PATCHES =	Patches/*
-#ALL_TGT =	bootstrap
 
 include ../Makefile.targ
 include ../Makefile.targ.autoconf
