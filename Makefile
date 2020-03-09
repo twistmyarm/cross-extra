@@ -36,7 +36,8 @@ STRAP=strap
 NATIVE_HOST_SUBDIRS = \
 	binutils \
 	gcc7 \
-	cpp
+	cpp \
+	libz
 
 #
 # These directories are what we need to build for the target system.
