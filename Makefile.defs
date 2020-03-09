@@ -28,8 +28,8 @@ CTF.64 =	ctfobjects-$(ARCH)-64$(STRAP)
 
 ifeq ($(STRAP),strap)
 STRAPPROTO =	$(DESTDIR)
-GCC =		$(DESTDIR)/usr/gcc/4/bin/gcc
-GXX =		$(DESTDIR)/usr/gcc/4/bin/g++
+GCC =		$(DESTDIR)/usr/gcc/7/bin/gcc
+GXX =		$(DESTDIR)/usr/gcc/7/bin/g++
 else
 STRAPPROTO =	$(DESTDIR:proto=proto.strap)
 GCC =		$(DESTDIR)/usr/bin/gcc
