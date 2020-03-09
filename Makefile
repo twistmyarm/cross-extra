@@ -38,6 +38,7 @@ NATIVE_HOST_SUBDIRS = \
 	gcc7 \
 	cpp \
 	libz \
+	openssl \
 	sqlite3
 
 #
