@@ -37,7 +37,8 @@ NATIVE_HOST_SUBDIRS = \
 	binutils \
 	gcc7 \
 	cpp \
-	libz
+	libz \
+	sqlite3
 
 #
 # These directories are what we need to build for the target system.
