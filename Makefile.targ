@@ -58,15 +58,15 @@ install_autoconf_64: all
 	    $(MAKE) $(install_PARALLEL) $(OVERRIDES.64) DESTDIR=$(DESTDIR) \
 	    $(INSTALL_TGT))
 
-$(AUTOCONF_OUT.32): $(VER.32)/configure | $(OBJ.32)
+$(AUTOCONF_OUT.32): $(VER.32)/$(UNPACK_SENTINEL) | $(OBJ.32)
 	(cd $(OBJ.32); \
 	    env - PATH=$(PATH) $(AUTOCONF_ENV) \
-	    $(SEPARATE_BUILD:yes=$(VER.32)/)./configure $(AUTOCONF_OPTS.32))
+	    $(SEPARATE_BUILD:yes=$(VER.32)/)./$(UNPACK_SENTINEL) $(AUTOCONF_OPTS.32))
 
-$(AUTOCONF_OUT.64): $(VER.64)/configure | $(OBJ.64)
+$(AUTOCONF_OUT.64): $(VER.64)/$(UNPACK_SENTINEL) | $(OBJ.64)
 	(cd $(OBJ.64); \
 	    env - PATH=$(PATH) $(AUTOCONF_ENV.64) \
-	    $(SEPARATE_BUILD:yes=$(VER.64)/)./configure $(AUTOCONF_OPTS.64))
+	    $(SEPARATE_BUILD:yes=$(VER.64)/)./$(UNPACK_SENTINEL) $(AUTOCONF_OPTS.64))
 
 $(VER.32)/$(UNPACK_SENTINEL): $(TARBALL)
 	-rm -rf $(VER.32) $(OBJ.32) $(UNPACK.32)
