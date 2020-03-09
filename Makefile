@@ -19,7 +19,7 @@
 
 ARCHS =		i86pc armv8 riscv
 NATIVE_ARCH =	$(shell uname -i)
-ALT_ARCHS =	$(filter-out $(NATIVE_ARCH),$(ARCHS))
+CROSS_ARCHS =	$(filter-out $(NATIVE_ARCH),$(ARCHS))
 NATIVE_DESTDIR=	$(BASE_DESTDIR)/$(NATIVE_ARCH)
 
 #
@@ -51,8 +51,18 @@ NATIVE_TARGET_SUBDIRS= \
 
 all: strap
 
-strap:
-	for arch in $(ARCHS); do \
+strap.host:
+	for d in $(NATIVE_HOST_SUBDIRS); do \
+		(cd $$d && \
+		    STRAP=$(STRAP) \
+		    PKG_CONFIG_LIBDIR="" \
+		    NATIVE_ARCH=$(NATIVE_ARCH) \
+		    ARCH=$(NATIVE_ARCH) \
+		    $(MAKE) install); \
+	done
+
+strap: strap.host
+	for arch in $(CROSS_ARCHS); do \
 		for d in $(NATIVE_TARGET_SUBDIRS); do \
 			(cd $$d && \
 			    STRAP=$(STRAP) \
